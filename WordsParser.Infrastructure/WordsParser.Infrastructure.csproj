@@ -15,6 +15,7 @@
     <Folder Include="Database\Interfaces\" />
     <Folder Include="Repositories\Interfaces\" />
     <Folder Include="DTO\" />
+    <Folder Include="Strategies\Interfaces\" />
   </ItemGroup>
 
 </Project>

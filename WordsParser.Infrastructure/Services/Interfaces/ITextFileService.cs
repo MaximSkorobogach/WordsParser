@@ -2,5 +2,5 @@
 
 public interface ITextFileService
 {
-    Dictionary<string, int> GetWordsCountMap(string filePath);
+    List<Word> GetWords(string? filePath);
 }

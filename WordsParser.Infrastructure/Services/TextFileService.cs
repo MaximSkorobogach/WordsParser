@@ -1,32 +1,31 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using WordsParser.Infrastructure.Configurations.Interfaces;
+using WordsParser.Infrastructure.DTO;
 using WordsParser.Infrastructure.Services.Interfaces;
 
 namespace WordsParser.Infrastructure.Services;
 
 public class TextFileService(IWordsParserSettings wordsParserSettings) : ITextFileService
 {
-    public Dictionary<string, int> GetWordsCountMap(string filePath)
+    public List<Word> GetWords(string? filePath)
     {
-        var words = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var fileContent = File.ReadAllText(filePath, Encoding.UTF8);
 
         var matches = 
             Regex.Matches(fileContent, wordsParserSettings.RegexWordPattern, 
                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        foreach (Match match in matches)
-        {
-            var word = match.Value.ToLowerInvariant();
+        var filteredWords = 
+            matches
+                .Where(word => word.Length >= wordsParserSettings.MinFrequency)
+                .Select(match => match.Value.ToLowerInvariant());
 
-            if (word.Length < wordsParserSettings.MinFrequency) continue;
-
-            if (!words.TryAdd(word, 1))
-            {
-                words[word]++;
-            }
-        }
+        var words = 
+            filteredWords
+                .GroupBy(word => word)
+                .Select(word => new Word(word.Key, word.Count()))
+                .ToList();
 
         return words;
     }

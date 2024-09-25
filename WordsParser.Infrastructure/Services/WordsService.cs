@@ -7,9 +7,9 @@ namespace WordsParser.Infrastructure.Services;
 
 public class WordsService(IRepository<Word> wordsRepository) : IWordsService
 {
-    public async Task SaveWordsCountAsync(Dictionary<string, int> wordsCountMap)
+    public async Task SaveWordsCountAsync(List<Word> words)
     {
-        foreach (var word in wordsCountMap.Select(map => new Word(map.Key, map.Value)))
+        foreach (var word in words)
             await wordsRepository.AddOrUpdateAsync(word);
     }
 }
