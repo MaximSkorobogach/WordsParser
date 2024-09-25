@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordsParser.Client", "WordsParser\WordsParser.Client.csproj", "{A494A776-22FF-4870-94A5-EF0DCE95BABF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordsParser.Infrastructure", "WordsParser.Infrastructure\WordsParser.Infrastructure.csproj", "{E88D5D1F-8276-4482-951A-D92E4C0A3A9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordsParser.Infrastructure", "WordsParser.Infrastructure\WordsParser.Infrastructure.csproj", "{E88D5D1F-8276-4482-951A-D92E4C0A3A9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordsParser.Tests", "WordsParser.Tests\WordsParser.Tests.csproj", "{653CB1C4-1059-4FA4-A982-E400E85F1427}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordsParser.Tests", "WordsParser.Tests\WordsParser.Tests.csproj", "{653CB1C4-1059-4FA4-A982-E400E85F1427}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordsParser.ConsoleApp", "WordsParser.ConsoleApp\WordsParser.ConsoleApp.csproj", "{19E0B4B0-931A-4BD6-A3C1-E8FC32A6AABE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A494A776-22FF-4870-94A5-EF0DCE95BABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A494A776-22FF-4870-94A5-EF0DCE95BABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A494A776-22FF-4870-94A5-EF0DCE95BABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A494A776-22FF-4870-94A5-EF0DCE95BABF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E88D5D1F-8276-4482-951A-D92E4C0A3A9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E88D5D1F-8276-4482-951A-D92E4C0A3A9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E88D5D1F-8276-4482-951A-D92E4C0A3A9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{653CB1C4-1059-4FA4-A982-E400E85F1427}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{653CB1C4-1059-4FA4-A982-E400E85F1427}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{653CB1C4-1059-4FA4-A982-E400E85F1427}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19E0B4B0-931A-4BD6-A3C1-E8FC32A6AABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19E0B4B0-931A-4BD6-A3C1-E8FC32A6AABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19E0B4B0-931A-4BD6-A3C1-E8FC32A6AABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19E0B4B0-931A-4BD6-A3C1-E8FC32A6AABE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
