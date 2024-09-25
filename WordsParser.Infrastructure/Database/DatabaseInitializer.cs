@@ -1,9 +1,10 @@
 ﻿using System.Data.SqlClient;
 using WordsParser.Infrastructure.Consts;
+using WordsParser.Infrastructure.Database.Interfaces;
 
 namespace WordsParser.Infrastructure.Database
 {
-    public class DatabaseInitializer(string connectionString)
+    public class DatabaseInitializer(string connectionString) : IDatabaseInitializer
     {
         public async Task InitializeDatabaseAsync()
         {

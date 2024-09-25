@@ -1,8 +1,15 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WordsParser.Infrastructure.Configurations;
+using WordsParser.Infrastructure.Configurations.Interfaces;
 using WordsParser.Infrastructure.Database;
+using WordsParser.Infrastructure.Database.Interfaces;
+using WordsParser.Infrastructure.DTO;
 using WordsParser.Infrastructure.Repositories;
+using WordsParser.Infrastructure.Repositories.Interfaces;
+using WordsParser.Infrastructure.Services;
+using WordsParser.Infrastructure.Services.Interfaces;
 
 namespace WordsParser.ConsoleApp
 {
@@ -24,7 +31,13 @@ namespace WordsParser.ConsoleApp
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddScoped(provider =>
+                    services.AddSingleton<IWordsParserSettings>(
+                        context.Configuration.GetSection(nameof(WordsParserSettings)).Get<WordsParserSettings>()
+                        ?? throw new InvalidOperationException());
+
+                    services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
+
+                    services.AddTransient(provider =>
                     {
                         var configuration = provider.GetRequiredService<IConfiguration>();
                         var connectionString = configuration.GetConnectionString("DefaultConnection")
@@ -32,8 +45,10 @@ namespace WordsParser.ConsoleApp
                         return new DatabaseContext(connectionString);
                     });
 
-                    services.AddSingleton<DatabaseInitializer>();
-                    services.AddScoped<WordsRepository>(); 
+
+                    services.AddTransient<IRepository<Word>, WordsRepository>(); 
+                    services.AddTransient<IWordsService, WordsService>(); 
+                    services.AddTransient<ITextFileService, TextFileService>(); 
                 });
     }
 }
