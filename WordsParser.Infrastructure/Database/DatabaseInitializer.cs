@@ -3,18 +3,11 @@ using WordsParser.Infrastructure.Consts;
 
 namespace WordsParser.Infrastructure.Database
 {
-    public class DatabaseInitializer
+    public class DatabaseInitializer(string connectionString)
     {
-        private readonly string _connectionString;
-
-        public DatabaseInitializer(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
-
         public async Task InitializeDatabaseAsync()
         {
-            await using var connection = new SqlConnection(_connectionString);
+            await using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
             var command = new SqlCommand(@$"
