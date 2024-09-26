@@ -45,29 +45,42 @@ namespace WordsParser.ConsoleApp
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    var connectionString = context.Configuration.GetConnectionString("DefaultConnection")
-                                           ?? throw new Exception("Не задана строка подключения к серверу ms sql");
-                    
-                    RegisterConfigs(services, context);
+                    var configuration = context.Configuration;
 
-                    services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>(provider => new DatabaseInitializer(connectionString));
-                    services.AddTransient(provider => new DatabaseContext(connectionString));
+                    RegisterConfigs(services, configuration);
 
-                    services.AddTransient<IRepository<Word>, WordsRepository>();
-                    services.AddTransient<IWordsService, WordsService>();
-                    services.AddTransient<ITextFileService, TextFileService>();
-                    services.AddTransient<IFileService, FileService>();
-                    services.AddTransient<IEndlessWordParserHandler, EndlessWordParserHandler>();
-                    services.AddTransient<IFileProcessingStrategy, FileProcessingStrategy>();
+                    RegisterDatabase(services, configuration);
+
+                    RegisterServices(services);
                 });
 
-        private static void RegisterConfigs(IServiceCollection services, HostBuilderContext context)
+        private static void RegisterDatabase(IServiceCollection services, IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                                   ?? throw new Exception("Не задана строка подключения к серверу ms sql");
+
+            services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>(provider => new DatabaseInitializer(connectionString));
+
+            services.AddScoped(provider => new DatabaseContext(connectionString));
+            services.AddScoped<IRepository<Word>, WordsRepository>();
+        }
+
+        private static void RegisterServices(IServiceCollection services)
+        {
+            services.AddTransient<IWordsService, WordsService>();
+            services.AddTransient<ITextFileService, TextFileService>();
+            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IEndlessWordParserHandler, EndlessWordParserHandler>();
+            services.AddTransient<IFileProcessingStrategy, FileProcessingStrategy>();
+        }
+
+        private static void RegisterConfigs(IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IWordsParserSettings>(
-                context.Configuration.GetSection(nameof(WordsParserSettings)).Get<WordsParserSettings>()
+                configuration.GetSection(nameof(WordsParserSettings)).Get<WordsParserSettings>()
                 ?? throw new Exception("Не удалось обнаружить настройки для парсинга"));
             services.AddSingleton<IFileSettings>(
-                context.Configuration.GetSection(nameof(FileSettings)).Get<FileSettings>()
+                configuration.GetSection(nameof(FileSettings)).Get<FileSettings>()
                 ?? throw new Exception("Не удалось обнаружить настройки для обработки файла"));
         }
     }
