@@ -8,9 +8,17 @@ namespace WordsParser.Infrastructure.Services;
 
 public class TextFileService(IWordsParserSettings wordsParserSettings) : ITextFileService
 {
+    public void ThrowIfFileNotExists(string? filePath)
+    {
+        if (filePath is null || !File.Exists(filePath))
+            throw new Exception("Путь к файлу не доступен.");
+    }
+
     public List<Word> GetWords(string? filePath)
     {
-        var fileContent = File.ReadAllText(filePath, Encoding.UTF8);
+        ThrowIfFileNotExists(filePath);
+
+        var fileContent = File.ReadAllText(filePath!, Encoding.UTF8);
 
         var matches = 
             Regex.Matches(fileContent, wordsParserSettings.RegexWordPattern, 

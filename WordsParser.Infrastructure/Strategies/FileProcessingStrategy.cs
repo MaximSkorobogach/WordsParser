@@ -7,18 +7,24 @@ namespace WordsParser.Infrastructure.Strategies;
 public class FileProcessingStrategy(IFileSettings fileSettings, 
     ITextFileService textFileService, IWordsService wordsService) : IFileProcessingStrategy
 {
-    public async Task ExecuteAsync(string? filePath)
+    public async Task TryExecuteAsync(string? filePath)
     {
-        if (filePath is null || !File.Exists(filePath))
-            throw new Exception("Путь к файлу не доступен.");
+        try
+        {
+            textFileService.ThrowIfFileNotExists(filePath);
 
-        var fileInfo = new FileInfo(filePath);
+            var fileInfo = new FileInfo(filePath!);
 
-        if (fileInfo.Length > fileSettings.MaxFileSizeMbytes)
-            throw new Exception("Файл превышает лимит в 1000 МБ.");
+            if (fileInfo.Length > fileSettings.MaxFileSizeMbytes)
+                throw new Exception("Файл превышает лимит в 1000 МБ.");
 
-        var wordsCountMap = textFileService.GetWordsCountMap(filePath);
+            var wordsCountMap = textFileService.GetWords(filePath);
 
-        await wordsService.SaveWordsCountAsync(wordsCountMap);
+            await wordsService.SaveWordsCountAsync(wordsCountMap);
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Не удалось обработать файл, message : {e.Message}");
+        }
     }
 }

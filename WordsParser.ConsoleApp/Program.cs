@@ -3,13 +3,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WordsParser.Infrastructure.Configurations;
 using WordsParser.Infrastructure.Configurations.Interfaces;
+using WordsParser.Infrastructure.Consts;
 using WordsParser.Infrastructure.Database;
 using WordsParser.Infrastructure.Database.Interfaces;
 using WordsParser.Infrastructure.DTO;
+using WordsParser.Infrastructure.Handlers;
+using WordsParser.Infrastructure.Handlers.Interfaces;
 using WordsParser.Infrastructure.Repositories;
 using WordsParser.Infrastructure.Repositories.Interfaces;
 using WordsParser.Infrastructure.Services;
 using WordsParser.Infrastructure.Services.Interfaces;
+using WordsParser.Infrastructure.Strategies;
 using WordsParser.Infrastructure.Strategies.Interfaces;
 
 namespace WordsParser.ConsoleApp
@@ -22,27 +26,9 @@ namespace WordsParser.ConsoleApp
 
             await InitializeDatabaseAsync(host);
 
-            await StartProcess(host);
+            await host.Services.GetRequiredService<IEndlessWordParserHandler>().StartHandlingAsync();
         }
 
-        private static async Task StartProcess(IHost host)
-        {
-            var fileProcessingStrategy = host.Services.GetRequiredService<IFileProcessingStrategy>();
-
-            while (true)
-            {
-                var input = Console.ReadLine();
-
-                try
-                {
-                    await fileProcessingStrategy.ExecuteAsync(input);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Ошибка: {ex.Message}");
-                }
-            }
-        }
 
         private static async Task InitializeDatabaseAsync(IHost host)
         {
@@ -59,19 +45,19 @@ namespace WordsParser.ConsoleApp
                 })
                 .ConfigureServices((context, services) =>
                 {
+                    var connectionString = context.Configuration.GetConnectionString("DefaultConnection")
+                                           ?? throw new Exception("Не задана строка подключения к серверу ms sql");
+                    
                     RegisterConfigs(services, context);
 
-                    services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
-                    services.AddTransient(provider =>
-                    {
-                        var connectionString = context.Configuration.GetConnectionString("DefaultConnection")
-                                               ?? throw new Exception("Не задана строка подключения к серверу ms sql");
-                        return new DatabaseContext(connectionString);
-                    });
+                    services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>(provider => new DatabaseInitializer(connectionString));
+                    services.AddTransient(provider => new DatabaseContext(connectionString));
 
                     services.AddTransient<IRepository<Word>, WordsRepository>();
                     services.AddTransient<IWordsService, WordsService>();
                     services.AddTransient<ITextFileService, TextFileService>();
+                    services.AddTransient<IEndlessWordParserHandler, EndlessWordParserHandler>();
+                    services.AddTransient<IFileProcessingStrategy, FileProcessingStrategy>();
                 });
 
         private static void RegisterConfigs(IServiceCollection services, HostBuilderContext context)

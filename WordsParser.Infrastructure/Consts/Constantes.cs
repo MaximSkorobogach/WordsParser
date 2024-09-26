@@ -2,6 +2,11 @@
 
 public class Constantes
 {
+    public class ConsoleCommands
+    {
+        public const string ExitCommand = "exit";
+    }
+
     public class Database
     {
         public const string WordsDatabase = "WordsParserDB";

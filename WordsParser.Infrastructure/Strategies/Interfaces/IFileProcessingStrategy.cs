@@ -2,5 +2,5 @@
 
 public interface IFileProcessingStrategy
 {
-    Task ProcessFileAsync(string filePath);
+    Task TryExecuteAsync(string? filePath);
 }
