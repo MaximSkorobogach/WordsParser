@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using WordsParser.Infrastructure.Configurations;
 using WordsParser.Infrastructure.Configurations.Interfaces;
 using WordsParser.Infrastructure.Consts;
 using WordsParser.Infrastructure.Database;
 using WordsParser.Infrastructure.Database.Interfaces;
+using WordsParser.Infrastructure.DI;
 using WordsParser.Infrastructure.DTO;
 using WordsParser.Infrastructure.Handlers;
 using WordsParser.Infrastructure.Handlers.Interfaces;
@@ -47,41 +49,7 @@ namespace WordsParser.ConsoleApp
                 {
                     var configuration = context.Configuration;
 
-                    RegisterConfigs(services, configuration);
-
-                    RegisterDatabase(services, configuration);
-
-                    RegisterServices(services);
+                    services.AddInfrastructure(configuration);
                 });
-
-        private static void RegisterDatabase(IServiceCollection services, IConfiguration configuration)
-        {
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                                   ?? throw new Exception("Не задана строка подключения к серверу ms sql");
-
-            services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>(provider => new DatabaseInitializer(connectionString));
-
-            services.AddScoped(provider => new DatabaseContext(connectionString));
-            services.AddScoped<IRepository<Word>, WordsRepository>();
-        }
-
-        private static void RegisterServices(IServiceCollection services)
-        {
-            services.AddTransient<IWordsService, WordsService>();
-            services.AddTransient<ITextFileService, TextFileService>();
-            services.AddTransient<IFileService, FileService>();
-            services.AddTransient<IEndlessWordParserHandler, EndlessWordParserHandler>();
-            services.AddTransient<IFileProcessingStrategy, FileProcessingStrategy>();
-        }
-
-        private static void RegisterConfigs(IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddSingleton<IWordsParserSettings>(
-                configuration.GetSection(nameof(WordsParserSettings)).Get<WordsParserSettings>()
-                ?? throw new Exception("Не удалось обнаружить настройки для парсинга"));
-            services.AddSingleton<IFileSettings>(
-                configuration.GetSection(nameof(FileSettings)).Get<FileSettings>()
-                ?? throw new Exception("Не удалось обнаружить настройки для обработки файла"));
-        }
     }
 }
