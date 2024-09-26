@@ -1,4 +1,5 @@
-﻿using WordsParser.Infrastructure.Services.Interfaces;
+﻿using Microsoft.Extensions.FileProviders;
+using WordsParser.Infrastructure.Services.Interfaces;
 
 namespace WordsParser.Infrastructure.Services;
 
@@ -10,5 +11,5 @@ internal class FileService : IFileService
             throw new FileNotFoundException("Путь к файлу не доступен.");
     }
 
-    public decimal ConvertBytesSizeToMbytesSize(long bytes) => bytes / (decimal)( 1024.0 * 1024.0 );
+    public decimal GetFileMBytesSize(FileInfo fileInfo) => fileInfo.Length / (decimal)( 1024.0 * 1024.0 );
 }

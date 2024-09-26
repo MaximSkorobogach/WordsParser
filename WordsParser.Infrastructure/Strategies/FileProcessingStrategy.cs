@@ -21,10 +21,10 @@ internal class FileProcessingStrategy(IOptions<FileSettings> fileSettings,
 
             var fileInfo = new FileInfo(filePath!);
 
-            var fileMbytesSize = fileService.ConvertBytesSizeToMbytesSize(fileInfo.Length);
+            var fileMbytesSize = fileService.GetFileMBytesSize(fileInfo);
 
             if (fileMbytesSize > fileSettings.Value.MaxFileSizeMbytes)
-                throw new Exception("Файл превышает лимит в 1000 МБ.");
+                throw new LargeFileException("Файл превышает лимит в 1000 МБ.");
 
             var wordsCountMap = textFileService.GetWords(filePath);
 

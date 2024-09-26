@@ -1,6 +1,6 @@
 ﻿namespace WordsParser.Infrastructure.Configurations;
 
-internal class FileSettings
+public class FileSettings
 {
     public decimal MaxFileSizeMbytes { get; set; }
 }
