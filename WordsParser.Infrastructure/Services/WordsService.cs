@@ -1,15 +1,23 @@
-﻿using WordsParser.Infrastructure.DTO;
-using WordsParser.Infrastructure.Repositories;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using WordsParser.Infrastructure.DTO;
 using WordsParser.Infrastructure.Repositories.Interfaces;
 using WordsParser.Infrastructure.Services.Interfaces;
 
 namespace WordsParser.Infrastructure.Services;
 
-public class WordsService(IRepository<Word> wordsRepository) : IWordsService
+internal class WordsService(IRepository<Word> wordsRepository, ILogger<IWordsService> logger) : IWordsService
 {
     public async Task SaveWordsCountAsync(List<Word> words)
     {
-        foreach (var word in words)
-            await wordsRepository.AddOrUpdateAsync(word);
+        logger.LogInformation($"Начало сохранения {words.Count} слов");
+        var stopWatch = new Stopwatch();
+
+        stopWatch.Start();
+
+        await wordsRepository.AddOrUpdateRangeAsync(words);
+
+        stopWatch.Stop();
+        logger.LogInformation($"Сохранение {words.Count} слов завершено, кол-во затраченного времени {stopWatch.Elapsed}");
     }
 }

@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using WordsParser.Infrastructure.Configurations.Interfaces;
 using WordsParser.Infrastructure.Configurations;
 using WordsParser.Infrastructure.Database.Interfaces;
 using WordsParser.Infrastructure.Database;
 using WordsParser.Infrastructure.DTO;
+using WordsParser.Infrastructure.Factories;
+using WordsParser.Infrastructure.Factories.Interfaces;
 using WordsParser.Infrastructure.Handlers.Interfaces;
 using WordsParser.Infrastructure.Handlers;
 using WordsParser.Infrastructure.Repositories.Interfaces;
@@ -39,12 +40,9 @@ public static class DependencyInjection
 
     private static IServiceCollection RegisterDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-                               ?? throw new Exception("Не задана строка подключения к серверу ms sql");
-
         return services
-            .AddSingleton<IDatabaseInitializer, DatabaseInitializer>(provider => new DatabaseInitializer(connectionString))
-            .AddScoped(provider => new DatabaseContext(connectionString))
+            .AddSingleton<IDatabaseInitializer, DatabaseInitializer>()
+            .AddScoped<IDatabaseContextFactory, DatabaseContextFactory>()
             .AddScoped<IRepository<Word>, WordsRepository>();
     }
 
@@ -61,11 +59,8 @@ public static class DependencyInjection
     private static IServiceCollection RegisterConfigs(this IServiceCollection services, IConfiguration configuration)
     {
         return services
-            .AddSingleton<IWordsParserSettings>(
-            configuration.GetSection(nameof(WordsParserSettings)).Get<WordsParserSettings>()
-            ?? throw new Exception("Не удалось обнаружить настройки для парсинга"))
-            .AddSingleton<IFileSettings>(
-            configuration.GetSection(nameof(FileSettings)).Get<FileSettings>()
-            ?? throw new Exception("Не удалось обнаружить настройки для обработки файла"));
+            .Configure<DatabaseConnectionOptions>(configuration.GetSection("ConnectionStrings"))
+            .Configure<WordsParserSettings>(configuration.GetSection(nameof(WordsParserSettings)))
+            .Configure<FileSettings>(configuration.GetSection(nameof(FileSettings)));
     }
 }

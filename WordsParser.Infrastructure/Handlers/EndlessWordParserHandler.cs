@@ -1,12 +1,14 @@
-﻿using WordsParser.Infrastructure.Consts;
+﻿using Microsoft.Extensions.Logging;
+using WordsParser.Infrastructure.Consts;
 using WordsParser.Infrastructure.Handlers.Interfaces;
 using WordsParser.Infrastructure.Strategies.Interfaces;
 
 namespace WordsParser.Infrastructure.Handlers;
 
-public class EndlessWordParserHandler(IFileProcessingStrategy fileProcessingStrategy) : IEndlessWordParserHandler
+internal class EndlessWordParserHandler(IFileProcessingStrategy fileProcessingStrategy, 
+    ILogger<IEndlessWordParserHandler> logger) : IEndlessWordParserHandler
 {
-    public async Task StartHandlingAsync()
+    public async Task TryStartHandlingAsync()
     {
         while (true)
         {
@@ -14,18 +16,17 @@ public class EndlessWordParserHandler(IFileProcessingStrategy fileProcessingStra
 
             var input = Console.ReadLine();
 
-            if (input?.Trim().ToLower() == Constantes.ConsoleCommands.ExitCommand)
-            {
-                break;
-            }
+            if(string.IsNullOrWhiteSpace(input)) continue;
+
+            if (input?.Trim().ToLower() == Constantes.ConsoleCommands.ExitCommand) break;
 
             try
             {
-                await fileProcessingStrategy.TryExecuteAsync(input);
+                await fileProcessingStrategy.ExecuteAsync(input);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка: {ex.Message}");
+                logger.LogError(ex, "Возникла ошибка обработки");
             }
         }
     }

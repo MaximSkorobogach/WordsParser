@@ -2,5 +2,5 @@
 
 public interface IRepository<in T>
 {
-    Task AddOrUpdateAsync(T word);
+    Task AddOrUpdateRangeAsync(IEnumerable<T> entities);
 }

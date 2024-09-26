@@ -1,14 +1,16 @@
 ﻿using System.Data.SqlClient;
+using Microsoft.Extensions.Options;
+using WordsParser.Infrastructure.Configurations;
 using WordsParser.Infrastructure.Consts;
 using WordsParser.Infrastructure.Database.Interfaces;
 
 namespace WordsParser.Infrastructure.Database
 {
-    public class DatabaseInitializer(string connectionString) : IDatabaseInitializer
+    internal class DatabaseInitializer(IOptions<DatabaseConnectionOptions> connectionOptions) : IDatabaseInitializer
     {
         public async Task InitializeDatabaseAsync()
         {
-            await using var connection = new SqlConnection(connectionString);
+            await using var connection = new SqlConnection(connectionOptions.Value.DefaultConnection);
             await connection.OpenAsync();
 
             var command = new SqlCommand(@$"

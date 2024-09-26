@@ -1,22 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using WordsParser.Infrastructure.Configurations;
-using WordsParser.Infrastructure.Configurations.Interfaces;
-using WordsParser.Infrastructure.Consts;
-using WordsParser.Infrastructure.Database;
 using WordsParser.Infrastructure.Database.Interfaces;
 using WordsParser.Infrastructure.DI;
-using WordsParser.Infrastructure.DTO;
-using WordsParser.Infrastructure.Handlers;
 using WordsParser.Infrastructure.Handlers.Interfaces;
-using WordsParser.Infrastructure.Repositories;
-using WordsParser.Infrastructure.Repositories.Interfaces;
-using WordsParser.Infrastructure.Services;
-using WordsParser.Infrastructure.Services.Interfaces;
-using WordsParser.Infrastructure.Strategies;
-using WordsParser.Infrastructure.Strategies.Interfaces;
 
 namespace WordsParser.ConsoleApp
 {
@@ -28,7 +15,7 @@ namespace WordsParser.ConsoleApp
 
             await InitializeDatabaseAsync(host);
 
-            await host.Services.GetRequiredService<IEndlessWordParserHandler>().StartHandlingAsync();
+            await host.Services.GetRequiredService<IEndlessWordParserHandler>().TryStartHandlingAsync();
         }
 
 

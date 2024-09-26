@@ -2,5 +2,5 @@
 
 public interface IEndlessWordParserHandler
 {
-    Task StartHandlingAsync();
+    Task TryStartHandlingAsync();
 }

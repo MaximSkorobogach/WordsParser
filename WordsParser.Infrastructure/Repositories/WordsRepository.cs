@@ -1,32 +1,35 @@
-﻿using System.Data.SqlClient;
-using System.Threading.Tasks;
-using WordsParser.Infrastructure.Consts;
-using WordsParser.Infrastructure.Database;
+﻿using WordsParser.Infrastructure.Consts;
 using WordsParser.Infrastructure.DTO;
+using WordsParser.Infrastructure.Factories.Interfaces;
 using WordsParser.Infrastructure.Repositories.Interfaces;
 
 namespace WordsParser.Infrastructure.Repositories
 {
-    public class WordsRepository(DatabaseContext context) : IRepository<Word>
+    internal class WordsRepository(IDatabaseContextFactory databaseContextFactory) : IRepository<Word>
     {
-        public async Task AddOrUpdateAsync(Word word)
+        public async Task AddOrUpdateRangeAsync(IEnumerable<Word> words)
         {
-            await context.OpenConnectionAsync();
+            await using var dbContext = databaseContextFactory.CreateDbContext();
 
-            var command = context.CreateCommand(@$"
-                IF EXISTS (SELECT 1 FROM {Constantes.Database.WordsTable} WHERE Word = @word)
-                BEGIN
-                    UPDATE Words SET Count = Count + @count WHERE Word = @word;
-                END
-                ELSE
-                BEGIN
-                    INSERT INTO Words (Word, Count) VALUES (@word, @count);
-                END");
+            await dbContext.ExecuteInTransactionAsync(async () =>
+            {
+                foreach (var word in words)
+                {
+                    var command = dbContext.CreateCommand(@$"
+                        MERGE {Constantes.Database.WordsTable} AS target
+                        USING (SELECT @word AS Word, @count AS Count) AS source
+                        ON target.Word = source.Word
+                        WHEN MATCHED THEN
+                            UPDATE SET target.Count = target.Count + source.Count
+                        WHEN NOT MATCHED THEN
+                            INSERT (Word, Count) VALUES (source.Word, source.Count);");
 
-            command.Parameters.AddWithValue("@word", word.WordName);
-            command.Parameters.AddWithValue("@count", word.Count);
+                    command.Parameters.AddWithValue("@word", word.WordName);
+                    command.Parameters.AddWithValue("@count", word.Count);
 
-            await command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
+            });
         }
     }
 }

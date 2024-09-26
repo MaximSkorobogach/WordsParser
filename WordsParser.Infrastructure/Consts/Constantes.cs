@@ -1,6 +1,6 @@
 ﻿namespace WordsParser.Infrastructure.Consts;
 
-public class Constantes
+internal class Constantes
 {
     public class ConsoleCommands
     {
