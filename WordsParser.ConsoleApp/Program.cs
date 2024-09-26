@@ -56,6 +56,7 @@ namespace WordsParser.ConsoleApp
                     services.AddTransient<IRepository<Word>, WordsRepository>();
                     services.AddTransient<IWordsService, WordsService>();
                     services.AddTransient<ITextFileService, TextFileService>();
+                    services.AddTransient<IFileService, FileService>();
                     services.AddTransient<IEndlessWordParserHandler, EndlessWordParserHandler>();
                     services.AddTransient<IFileProcessingStrategy, FileProcessingStrategy>();
                 });

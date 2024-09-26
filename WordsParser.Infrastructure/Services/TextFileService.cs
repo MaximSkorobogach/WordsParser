@@ -6,17 +6,11 @@ using WordsParser.Infrastructure.Services.Interfaces;
 
 namespace WordsParser.Infrastructure.Services;
 
-public class TextFileService(IWordsParserSettings wordsParserSettings) : ITextFileService
+public class TextFileService(IWordsParserSettings wordsParserSettings, IFileService filesService) : ITextFileService
 {
-    public void ThrowIfFileNotExists(string? filePath)
-    {
-        if (filePath is null || !File.Exists(filePath))
-            throw new Exception("Путь к файлу не доступен.");
-    }
-
     public List<Word> GetWords(string? filePath)
     {
-        ThrowIfFileNotExists(filePath);
+        filesService.ThrowIfFileNotExists(filePath);
 
         var fileContent = File.ReadAllText(filePath!, Encoding.UTF8);
 
@@ -24,14 +18,10 @@ public class TextFileService(IWordsParserSettings wordsParserSettings) : ITextFi
             Regex.Matches(fileContent, wordsParserSettings.RegexWordPattern, 
                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        var filteredWords = 
+        var words = 
             matches
                 .Where(word => word.Length >= wordsParserSettings.MinFrequency)
-                .Select(match => match.Value.ToLowerInvariant());
-
-        var words = 
-            filteredWords
-                .GroupBy(word => word)
+                .GroupBy(word => word.Value.ToLowerInvariant())
                 .Select(word => new Word(word.Key, word.Count()))
                 .ToList();
 

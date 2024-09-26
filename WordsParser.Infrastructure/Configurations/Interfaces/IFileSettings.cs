@@ -2,5 +2,5 @@
 
 public interface IFileSettings
 {
-    int MaxFileSizeMbytes { get; set; }
+    decimal MaxFileSizeMbytes { get; set; }
 }

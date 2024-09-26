@@ -5,17 +5,19 @@ using WordsParser.Infrastructure.Strategies.Interfaces;
 namespace WordsParser.Infrastructure.Strategies;
 
 public class FileProcessingStrategy(IFileSettings fileSettings, 
-    ITextFileService textFileService, IWordsService wordsService) : IFileProcessingStrategy
+    ITextFileService textFileService, IFileService fileService, IWordsService wordsService) : IFileProcessingStrategy
 {
     public async Task TryExecuteAsync(string? filePath)
     {
         try
         {
-            textFileService.ThrowIfFileNotExists(filePath);
+            fileService.ThrowIfFileNotExists(filePath);
 
             var fileInfo = new FileInfo(filePath!);
 
-            if (fileInfo.Length > fileSettings.MaxFileSizeMbytes)
+            var fileMbytesSize = fileService.ConvertBytesSizeToMbytesSize(fileInfo.Length);
+
+            if (fileMbytesSize > fileSettings.MaxFileSizeMbytes)
                 throw new Exception("Файл превышает лимит в 1000 МБ.");
 
             var wordsCountMap = textFileService.GetWords(filePath);
